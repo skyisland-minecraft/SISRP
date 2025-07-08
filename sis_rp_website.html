@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIS RP - Serveur FiveM Transfrontalier | Suisse • Italie • Savoie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #4ecdc4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #4ecdc4;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23001122" width="1200" height="800"/><g fill="%23ffffff" opacity="0.1"><circle cx="200" cy="200" r="100"/><circle cx="600" cy="400" r="150"/><circle cx="1000" cy="300" r="80"/></g></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: #fff;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        .countries {
+            padding: 5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .country-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .country-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .country-flag {
+            width: 60px;
+            height: 40px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .france-flag {
+            background: linear-gradient(90deg, #002395 33.33%, #ffffff 33.33%, #ffffff 66.66%, #ed2939 66.66%);
+        }
+
+        .switzerland-flag {
+            background: #da020e;
+            position: relative;
+        }
+
+        .switzerland-flag::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .italy-flag {
+            background: linear-gradient(90deg, #009246 33.33%, #ffffff 33.33%, #ffffff 66.66%, #ce2b37 66.66%);
+        }
+
+        .country-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+        }
+
+        .jobs-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .job-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .job-item:hover {
+            background: rgba(78, 205, 196, 0.2);
+            transform: scale(1.05);
+        }
+
+        .features {
+            padding: 5rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats {
+            padding: 3rem 0;
+            background: rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 0.5rem;
+        }
+
+        .join-section {
+            padding: 5rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+        }
+
+        .discord-info {
+            background: rgba(114, 137, 218, 0.2);
+            border: 1px solid rgba(114, 137, 218, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: inline-block;
+        }
+
+        footer {
+            background: rgba(15, 15, 35, 0.95);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .countries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(78, 205, 196, 0.5);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .server-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .server-ip {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #4ecdc4;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .server-ip:hover {
+            background: rgba(78, 205, 196, 0.2);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="floating-particles"></div>
+
+    <header>
+        <nav class="container">
+            <div class="logo">SIS RP</div>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#pays">Pays</a></li>
+                <li><a href="#features">Fonctionnalités</a></li>
+                <li><a href="#rejoindre">Rejoindre</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="accueil">
+        <div class="hero-content">
+            <h1>SIS RP</h1>
+            <p>Suisse • Italie • Savoie</p>
+            <p>Le premier serveur FiveM transfrontalier<br>Une expérience roleplay unique à travers 3 pays</p>
+            <a href="#rejoindre" class="cta-button">Rejoindre l'aventure</a>
+        </div>
+    </section>
+
+    <section class="countries" id="pays">
+        <div class="container">
+            <h2 class="section-title">Trois Pays, Une Aventure</h2>
+            <p class="section-subtitle">Découvrez un univers roleplay unique où trois territoires se rencontrent</p>
+            
+            <div class="countries-grid">
+                <div class="country-card">
+                    <div class="country-flag france-flag"></div>
+                    <h3>🇫🇷 Savoie (France)</h3>
+                    <p>Région française alpine avec ses propres institutions et services</p>
+                    <div class="jobs-list">
+                        <div class="job-item">Gendarmerie</div>
+                        <div class="job-item">Police Nationale</div>
+                        <div class="job-item">DGGN</div>
+                        <div class="job-item">Service Anti-Immigration</div>
+                        <div class="job-item">Douane</div>
+                        <div class="job-item">Armée française</div>
+                        <div class="job-item">Sapeurs Pompiers</div>
+                        <div class="job-item">Ambulance Privée</div>
+                        <div class="job-item">Samu 73</div>
+                        <div class="job-item">Gouvernement</div>
+                        <div class="job-item">Garage des Alpes</div>
+                        <div class="job-item">Tribunal</div>
+                        <div class="job-item">Loomis</div>
+                        <div class="job-item">APRR</div>
+                        <div class="job-item">187 (Tacos)</div>
+                        <div class="job-item">La Savoie Journal</div>
+                    </div>
+                </div>
+
+                <div class="country-card">
+                    <div class="country-flag switzerland-flag"></div>
+                    <h3>🇨🇭 Suisse</h3>
+                    <p>Système suisse authentique avec ses institutions cantonales</p>
+                    <div class="jobs-list">
+                        <div class="job-item">Police lausannoise</div>
+                        <div class="job-item">PCV : Gendarmerie</div>
+                        <div class="job-item">PCV : Police de Sûreté</div>
+                        <div class="job-item">Garde Frontière</div>
+                        <div class="job-item">SPSL</div>
+                        <div class="job-item">CHUV</div>
+                        <div class="job-item">Grand Conseil Vaudois</div>
+                        <div class="job-item">Tribunal</div>
+                        <div class="job-item">TCS</div>
+                        <div class="job-item">RTS</div>
+                        <div class="job-item">Coop Pronto</div>
+                    </div>
+                </div>
+
+                <div class="country-card">
+                    <div class="country-flag italy-flag"></div>
+                    <h3>🇮🇹 Italie</h3>
+                    <p>Institutions italiennes avec leurs spécificités méditerranéennes</p>
+                    <div class="jobs-list">
+                        <div class="job-item">Polizia</div>
+                        <div class="job-item">Carabinieri</div>
+                        <div class="job-item">Dogana</div>
+                        <div class="job-item">Vigili del Fuoco</div>
+                        <div class="job-item">SUEM</div>
+                        <div class="job-item">Il Sole 24 Ore</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Fonctionnalités Uniques</h2>
+            <p class="section-subtitle">Une expérience roleplay révolutionnaire</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Monde Transfrontalier</h3>
+                    <p>Trois pays interconnectés sur un seul serveur avec des frontières réalistes et des contrôles douaniers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👮</div>
+                    <h3>Forces de l'Ordre Authentiques</h3>
+                    <p>Chaque pays dispose de ses propres forces de police avec des procédures et équipements spécifiques</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏥</div>
+                    <h3>Services d'Urgence Réalistes</h3>
+                    <p>Systèmes médicaux et de secours adaptés à chaque pays (SAMU, CHUV, SUEM)</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📺</div>
+                    <h3>Médias Locaux</h3>
+                    <p>Journaux et médias spécifiques à chaque région pour une immersion totale</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚖️</div>
+                    <h3>Système Judiciaire</h3>
+                    <p>Tribunaux et procédures légales différentes selon les pays</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Coopération Internationale</h3>
+                    <p>Missions transfrontalières et coopération entre les services des trois pays</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <h2 class="section-title">Statistiques du Serveur</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div>Pays Différents</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">30+</div>
+                    <div>Métiers Disponibles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div>Serveur Actif</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div>Possibilités RP</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="join-section" id="rejoindre">
+        <div class="container">
+            <h2 class="section-title">Rejoindre SIS RP</h2>
+            <p class="section-subtitle">Commencez votre aventure transfrontalière dès maintenant</p>
+            
+            <div class="server-info">
+                <h3>Informations du Serveur</h3>
+                <div class="server-ip" onclick="copyToClipboard('connect IP_DU_SERVEUR')">
+                    connect IP_DU_SERVEUR
+                </div>
+                <p>Cliquez pour copier l'adresse IP</p>
+            </div>
+
+            <div class="discord-info">
+                <h3>🎮 Discord Officiel</h3>
+                <p>Rejoignez notre communauté Discord pour:</p>
+                <ul style="text-align: left; margin: 1rem 0;">
+                    <li>Candidater aux métiers</li>
+                    <li>Recevoir les actualités</li>
+                    <li>Participer aux événements</li>
+                    <li>Obtenir de l'aide</li>
+                </ul>
+                <a href="#" class="cta-button">Rejoindre Discord</a>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <h3>Comment démarrer ?</h3>
+                <p>1. Rejoignez notre Discord<br>
+                2. Lisez le règlement<br>
+                3. Créez votre personnage<br>
+                4. Choisissez votre pays de résidence<br>
+                5. Commencez votre aventure !</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 SIS RP - Serveur FiveM Transfrontalier</p>
+            <p>Suisse • Italie • Savoie - Une expérience roleplay unique</p>
+        </div>
+    </footer>
+
+    <script>
+        // Création des étoiles
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Création des particules flottantes
+        function createParticles() {
+            const particlesContainer = document.querySelector('.floating-particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Fonction pour copier l'IP
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('IP copiée dans le presse-papiers !');
+            });
+        }
+
+        // Défilement fluide
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animation des compteurs
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = counter.textContent;
+                if (target === '∞') return;
+                
+                const count = parseInt(target);
+                let current = 0;
+                const increment = count / 50;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= count) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 50);
+            });
+        }
+
+        // Observer pour les animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    
+                    if (entry.target.querySelector('.stat-number')) {
+                        animateCounters();
+                    }
+                }
+            });
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            createParticles();
+            
+            // Animation d'apparition pour les sections
+            document.querySelectorAll('.country-card, .feature-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+
+        // Effet de parallaxe léger
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.hero');
+            const speed = scrolled * 0.5;
+            parallax.style.transform = `translateY(${speed}px)`;
+        });
+    </script>
+</body>
+</html>
